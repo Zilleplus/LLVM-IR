@@ -4,6 +4,7 @@ add_library(Infra
     astVisit.cpp
     astToString.cpp
     scanner.cpp
+    parser.cpp
 )
 
 target_include_directories(Infra PUBLIC ${CMAKE_CURRENT_LIST_DIR})

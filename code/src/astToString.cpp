@@ -5,12 +5,12 @@ namespace infra
 {
     std::string NumberExpr::ToString() const
     {
-        return fmt::format("({})", val);
+        return fmt::format("{}", val);
     }
 
     std::string VariableExpr::ToString() const
     {
-        return fmt::format("({})", this->name);
+        return fmt::format("{}", this->name);
     }
 
     std::string BinaryExpr::ToString() const

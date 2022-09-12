@@ -75,6 +75,26 @@ TEST_CASE("Given_Text_Find_TokenType")
     }
 }
 
+TEST_CASE("Given_Bin_Op_Text_Find_Tokens")
+{
+    std::vector<std::pair<std::string, std::vector<TokenType>>> nums_text{
+        {"1+2*3", {TokenType::number, TokenType::plus, TokenType::number, TokenType::asterisk, TokenType::number}},
+    };
+
+    for(auto [input, exp] : nums_text)
+    {
+        Scanner s(input);
+        auto res= s.ScanTokens();
+        std::vector<TokenType> res_tok_types;
+        for(auto t : res)
+        {
+            res_tok_types.push_back(t.type);
+        }
+
+        REQUIRE(res_tok_types == exp);
+    }
+}
+
 TEST_CASE("Given_Example_Code_Find_Tokens")
 {
     std::string source =

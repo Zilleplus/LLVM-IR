@@ -3,7 +3,7 @@
 #include <string>
 #include <memory>
 #include <vector>
-#include <string>
+#include <token.h>
 
 namespace infra
 {
@@ -13,14 +13,12 @@ namespace infra
     {
     public:
         virtual ~Ast() {}
-        virtual void Visit(Visitor &vis);
-        virtual std::string ToString() const;
+        virtual void Visit(Visitor &vis) = 0;
+        virtual std::string ToString() const = 0;
     };
 
     class Expr : public Ast
     {
-    public:
-        virtual ~Expr() {}
     };
 
     class NumberExpr : public Expr
@@ -45,13 +43,40 @@ namespace infra
 
     enum class BinaryOperator
     {
-        PLUS
-
+        PLUS,
+        MINUS,
+        ASTERISK,
     };
 
-    inline std::string ToString(BinaryOperator op){
-        // At the moment only one binary operator is supported
-        return "+";
+    inline std::string ToString(BinaryOperator op)
+    {
+        switch (op)
+        {
+        case BinaryOperator::PLUS:
+            return "+";
+        case BinaryOperator::MINUS:
+            return "-";
+        case BinaryOperator::ASTERISK:
+            return "*";
+
+        default:
+            return "unknown binary operator";
+        }
+    }
+
+    inline BinaryOperator BinOpFromTokenType(TokenType t)
+    {
+        switch (t)
+        {
+        case TokenType::plus:
+            return BinaryOperator::PLUS;
+        case TokenType::minus:
+            return BinaryOperator::MINUS;
+        case TokenType::asterisk:
+            return BinaryOperator::ASTERISK;
+        default:
+            return BinaryOperator::PLUS;
+        }
     }
 
     class BinaryExpr : public Expr
@@ -84,13 +109,15 @@ namespace infra
         virtual std::string ToString() const override;
     };
 
-    class Prototype : Ast
+    class Prototype : public Ast
     {
         std::string name;
         std::vector<std::string> args;
 
     public:
-        explicit Prototype(const std::string name, std::vector<std::string> args) : name(name), args(std::move(args))
+        explicit Prototype(
+            const std::string& name, std::vector<std::string> args) 
+            : name(name), args(std::move(args))
         {
         }
 
@@ -108,7 +135,7 @@ namespace infra
         virtual std::string ToString() const override;
     };
 
-    class Function : Ast
+    class Function : public Ast
     {
         std::unique_ptr<Prototype> proto;
         std::unique_ptr<Expr> body;

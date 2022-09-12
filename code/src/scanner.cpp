@@ -135,6 +135,9 @@ namespace infra
             case '-':
                 AddToken(TokenType::minus);
                 break;
+            case '*':
+                AddToken(TokenType::asterisk);
+                break;
             case '<':
                 AddToken(TokenType::smaller_then);
                 break;
@@ -143,6 +146,8 @@ namespace infra
                 break;
             case ';':
                 AddToken(TokenType::semicolon);
+            case ',':
+                AddToken(TokenType::comma);
             case '#':
                 current_char = Peek();
                 while (current_char != '\n' && !IsAtEnd())

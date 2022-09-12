@@ -1,6 +1,7 @@
 add_executable(Tests 
     main.cpp
     scannerTests.cpp
+    parserTests.cpp
     )
 
 target_link_libraries(Tests PRIVATE Catch2::Catch2)

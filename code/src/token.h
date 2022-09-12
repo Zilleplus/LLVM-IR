@@ -1,40 +1,55 @@
 #pragma once
-#include<string>
+#include <string>
 
-namespace infra{
+namespace infra
+{
 
-enum class TokenType{
-    eof,
+    enum class TokenType
+    {
+        eof,
 
-    def,
-    ext,
+        def,
+        ext,
 
-    identifier,
-    number,
+        identifier,
+        number,
 
-    plus,
-    minus,
-    smaller_then,
-    greater_then,
-    semicolon,
+        plus,
+        minus,
+        asterisk,
+        smaller_then,
+        greater_then,
+        semicolon,
+        comma,
 
-    left_paren,
-    right_paren,
+        left_paren,
+        right_paren,
 
-    if_,
-    then,
-    else_
-};
+        if_,
+        then,
+        else_
+    };
 
-std::string ToString(TokenType);
+    std::string ToString(TokenType);
 
-struct Token{
-    TokenType type;
-    int line_number;
-    int position;
-    std::string txt;
-};
+    struct Token
+    {
+        TokenType type;
+        int line_number;
+        int position;
+        std::string txt;
 
-std::string ToString(const Token& t);
+        bool operator==(const Token &other) const
+        {
+            bool type_eq = type == other.type;
+            bool line_number_eq = line_number == other.line_number;
+            bool position_eq = position == other.position;
+            bool text_eq = txt == other.txt;
+
+            return type_eq && line_number_eq && position_eq && text_eq;
+        }
+    };
+
+    std::string ToString(const Token &t);
 
 }
