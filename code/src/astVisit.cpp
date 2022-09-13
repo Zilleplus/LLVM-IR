@@ -3,32 +3,32 @@
 // visitor logic on ast, seperate to keep ast code clean.
 
 namespace infra{
-    void NumberExpr::Visit(Visitor& vis)
+    void NumberExpr::Accept(Visitor& vis) const
     {
         vis.Visit(*this);
     }
 
-    void VariableExpr::Visit(Visitor& vis)
+    void VariableExpr::Accept(Visitor& vis) const
     {
         vis.Visit(*this);
     }
     
-    void BinaryExpr::Visit(Visitor& vis)
+    void BinaryExpr::Accept(Visitor& vis) const
     {
         vis.Visit(*this);
     }
 
-    void CallExpr::Visit(Visitor& vis)
+    void CallExpr::Accept(Visitor& vis) const
     {
         vis.Visit(*this);
     }
 
-    void Prototype::Visit(Visitor& vis)
+    void Prototype::Accept(Visitor& vis) const
     {
         vis.Visit(*this);
     }
 
-    void Function::Visit(Visitor& vis)
+    void Function::Accept(Visitor& vis) const
     {
         vis.Visit(*this);
     }

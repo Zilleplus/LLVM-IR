@@ -1,18 +1,18 @@
 #pragma once
-#include<ast.h>
+#include <ast.h>
 
 namespace infra
 {
     class Visitor
     {
     public:
-        virtual void Visit(const NumberExpr &expr);
-        virtual void Visit(const VariableExpr &expr);
-        virtual void Visit(const BinaryExpr &expr);
-        virtual void Visit(const CallExpr &expr);
-        virtual void Visit(const Prototype &expr);
-        virtual void Visit(const Function &expr);
+        virtual void Visit(const NumberExpr &expr) = 0;
+        virtual void Visit(const VariableExpr &expr) = 0;
+        virtual void Visit(const BinaryExpr &expr) = 0;
+        virtual void Visit(const CallExpr &expr) = 0;
+        virtual void Visit(const Prototype &expr) = 0;
+        virtual void Visit(const Function &expr) = 0;
     };
 
-    void DepthFirstVisit(Visitor&);
+    void DepthFirstVisit(Visitor &);
 }

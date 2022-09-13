@@ -237,9 +237,12 @@ namespace infra
         {
             auto arg = ParsePrimary();
             args.push_back(std::move(arg));
-            Match({TokenType::comma});
+            if (!Match({TokenType::comma}))
+            {
+                break;
+            }
         }
-
+        Advance(); // consume ')'
         return std::make_unique<CallExpr>(t.txt, std::move(args));
     }
 
@@ -273,6 +276,7 @@ namespace infra
             else if (t.type == TokenType::identifier)
             {
                 args.push_back(t.txt);
+                Match({TokenType::comma}); // consume the comma if it's there.
             }
             else
             {

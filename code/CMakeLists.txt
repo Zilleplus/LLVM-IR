@@ -26,6 +26,10 @@ conan_cmake_install(PATH_OR_REFERENCE .
  
 find_package(fmt REQUIRED)
 find_package(Catch2 REQUIRED)
+find_package(LLVM REQUIRED)
 
 add_subdirectory(tests)
 add_subdirectory(src)
+
+add_executable(driver ${CMAKE_CURRENT_LIST_DIR}/driver.cpp)
+target_link_libraries(driver Infra)

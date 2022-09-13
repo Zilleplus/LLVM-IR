@@ -29,12 +29,12 @@ namespace infra
         {
             args_str.push_back(a->ToString());
         }
-        return fmt::format("(call {} {})", this->callee, fmt::join(args_str, ", "));
+        return fmt::format("(call {} {})", this->callee, fmt::join(args_str, " "));
     }
 
     std::string Prototype::ToString() const
     {
-        return fmt::format("(prototype {} {})", this->name, fmt::join(this->args, ", "));
+        return fmt::format("(prototype {} {})", this->name, fmt::join(this->args, " "));
     }
 
     std::string Function::ToString() const

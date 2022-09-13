@@ -13,7 +13,7 @@ namespace infra
     {
     public:
         virtual ~Ast() {}
-        virtual void Visit(Visitor &vis) = 0;
+        virtual void Accept(Visitor &vis) const = 0;
         virtual std::string ToString() const = 0;
     };
 
@@ -27,8 +27,9 @@ namespace infra
 
     public:
         explicit NumberExpr(double val) : val(val) {}
-        virtual void Visit(Visitor &vis) override;
+        virtual void Accept(Visitor &vis) const override;
         virtual std::string ToString() const override;
+        double Val() const { return val; }
     };
 
     class VariableExpr : public Expr
@@ -37,8 +38,10 @@ namespace infra
 
     public:
         explicit VariableExpr(std::string name) : name(name) {}
-        virtual void Visit(Visitor &vis) override;
+        virtual void Accept(Visitor &vis) const override;
         virtual std::string ToString() const override;
+
+        std::string Name() const { return name; }
     };
 
     enum class BinaryOperator
@@ -46,6 +49,8 @@ namespace infra
         PLUS,
         MINUS,
         ASTERISK,
+        SMALLER_THEN,
+        GREATHER_THEN
     };
 
     inline std::string ToString(BinaryOperator op)
@@ -58,7 +63,10 @@ namespace infra
             return "-";
         case BinaryOperator::ASTERISK:
             return "*";
-
+        case BinaryOperator::SMALLER_THEN:
+            return "<";
+        case BinaryOperator::GREATHER_THEN:
+            return ">";
         default:
             return "unknown binary operator";
         }
@@ -93,8 +101,22 @@ namespace infra
         {
         }
 
-        virtual void Visit(Visitor &vis) override;
+        virtual void Accept(Visitor &vis) const override;
         virtual std::string ToString() const override;
+
+        const Expr &Left() const
+        {
+            return *left;
+        }
+        const Expr &Right() const
+        {
+            return *right;
+        }
+
+        const BinaryOperator Op() const
+        {
+            return op;
+        }
     };
 
     class CallExpr : public Expr
@@ -105,8 +127,18 @@ namespace infra
     public:
         explicit CallExpr(const std::string &callee, std::vector<std::unique_ptr<Expr>> args)
             : callee(callee), args(std::move(args)) {}
-        virtual void Visit(Visitor &vis) override;
+        virtual void Accept(Visitor &vis) const override;
         virtual std::string ToString() const override;
+
+        std::string Callee() const
+        {
+            return callee;
+        }
+
+        const std::vector<std::unique_ptr<Expr>> &Args() const
+        {
+            return args;
+        }
     };
 
     class Prototype : public Ast
@@ -116,22 +148,22 @@ namespace infra
 
     public:
         explicit Prototype(
-            const std::string& name, std::vector<std::string> args) 
+            const std::string &name, std::vector<std::string> args)
             : name(name), args(std::move(args))
         {
         }
 
-        const std::string &Name() const &
+        std::string Name() const
         {
             return name;
         }
 
-        std::string Name() &&
+        const std::vector<std::string> &Args() const
         {
-            return std::move(name);
+            return args;
         }
 
-        virtual void Visit(Visitor &vis) override;
+        virtual void Accept(Visitor &vis) const override;
         virtual std::string ToString() const override;
     };
 
@@ -148,7 +180,17 @@ namespace infra
         {
         }
 
-        virtual void Visit(Visitor &vis) override;
+        const Prototype &Proto() const
+        {
+            return *proto;
+        }
+
+        const Expr &Body() const
+        {
+            return *body;
+        }
+
+        virtual void Accept(Visitor &vis) const override;
         virtual std::string ToString() const override;
     };
 } // namespace infra

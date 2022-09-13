@@ -146,8 +146,10 @@ namespace infra
                 break;
             case ';':
                 AddToken(TokenType::semicolon);
+                break;
             case ',':
                 AddToken(TokenType::comma);
+                break;
             case '#':
                 current_char = Peek();
                 while (current_char != '\n' && !IsAtEnd())

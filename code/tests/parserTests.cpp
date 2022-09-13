@@ -81,3 +81,61 @@ TEST_CASE("Given_Function_In_Source_Find_AST")
 
     REQUIRE(res_str == exp_str);
 }
+
+TEST_CASE("Given_Call_In_Source_Find_Ast")
+{
+    std::string source = 
+        "f(x)";
+
+    Scanner scanner(source);
+    auto tks = scanner.ScanTokens();
+
+    std::vector<TokenType> exp_types = {
+        TokenType::identifier,
+        TokenType::left_paren,
+        TokenType::identifier,
+        TokenType::right_paren
+    };
+    auto res_tokens_type = Types(tks);
+    REQUIRE(res_tokens_type == exp_types);
+
+    Parser parser(tks);
+    auto res = parser.ParseIndentifier();
+
+    std::string exp_str = "(call f x)";
+    auto res_str = res->ToString();
+
+    REQUIRE(res_str == exp_str);
+}
+
+TEST_CASE("Given_2_Argment_Function_in_source_find_ast")
+{
+    std::string source = 
+        "def sum(x, y) x + y";
+
+    Scanner scanner(source);
+    auto tks = scanner.ScanTokens();
+
+    std::vector<TokenType> exp_types = {
+        TokenType::def,
+        TokenType::identifier,
+        TokenType::left_paren,
+        TokenType::identifier,
+        TokenType::comma,
+        TokenType::identifier,
+        TokenType::right_paren,
+        TokenType::identifier,
+        TokenType::plus,
+        TokenType::identifier
+    };
+    auto res_tokens_type = Types(tks);
+    REQUIRE(res_tokens_type == exp_types);
+
+    Parser parser(tks);
+    auto res = parser.ParseDefinition();
+
+    std::string exp_str = "(function (prototype sum x y) (+ x y))";
+    auto res_str = res->ToString();
+
+    REQUIRE(res_str == exp_str);
+}
