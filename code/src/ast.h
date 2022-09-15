@@ -141,6 +141,22 @@ namespace infra
         }
     };
 
+    class IfExpr : public Expr{
+        std::unique_ptr<Expr> condition;
+        std::unique_ptr<Expr> then_expr;
+        std::unique_ptr<Expr> else_expr;
+
+        IfExpr(
+        std::unique_ptr<Expr> condition,
+        std::unique_ptr<Expr> then_expr,
+        std::unique_ptr<Expr> else_expr) : 
+            condition(std::move(condition)),
+            then_expr(std::move(then_expr)),
+            else_expr(std::move(then_expr))
+        {}
+
+    };
+
     class Prototype : public Ast
     {
         std::string name;

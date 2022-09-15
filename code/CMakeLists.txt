@@ -1,5 +1,8 @@
 cmake_minimum_required(VERSION 3.20)
-project(llvm-ir CXX)
+project(llvm-ir CXX C)
+
+# Not clean, I should find a better way to do this.
+set(CMAKE_CXX_FLAGS "-fuse-ld=gold")
 
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_BINARY_DIR})
 list(APPEND CMAKE_PREFIX_PATH ${CMAKE_BINARY_DIR})
@@ -32,4 +35,4 @@ add_subdirectory(tests)
 add_subdirectory(src)
 
 add_executable(driver ${CMAKE_CURRENT_LIST_DIR}/driver.cpp)
-target_link_libraries(driver Infra)
+target_link_libraries(driver Infra fmt::fmt)

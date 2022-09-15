@@ -36,7 +36,6 @@ namespace infra
 
         std::unique_ptr<Function> ParseTopLevelExpr();
 
-    private:
         struct Error{
             int line_number;
             int position;
@@ -48,19 +47,22 @@ namespace infra
             void Print() const;
         };
 
-        /// @brief Consume the current token.
-        Token Advance();
+        static std::string anon_expr;
 
         /// @brief Get the current token without consuming it
         Token Peek() const;
+
+        /// @brief Are there more tokens to be consumed?
+        bool IsAtEnd() const;
+    private:
+
+        /// @brief Consume the current token.
+        Token Advance();
 
         std::optional<Token> PeekNext() const;
 
         /// @brief Check if the next token type equals some type
         bool Check(TokenType) const;
-
-        /// @brief Are there more tokens to be consumed?
-        bool IsAtEnd() const;
 
         /// @brief Check if the next token equals one of the provided token types. Consume the token on match.
         bool Match(std::initializer_list<TokenType> tokens);

@@ -6,6 +6,8 @@
 
 namespace infra
 {
+    std::string Parser::anon_expr  = "__anon_expr";
+
     Parser::Parser(const std::vector<Token> &tokens) : tokens(tokens), current(0)
     {
         binOpPrecedence[TokenType::smaller_then] = 10;
@@ -310,7 +312,7 @@ namespace infra
     std::unique_ptr<Function> Parser::ParseTopLevelExpr()
     {
         auto proto = std::make_unique<Prototype>(
-            "", std::vector<std::string>{});
+            Parser::anon_expr, std::vector<std::string>{});
 
         auto body = ParseExpression();
 

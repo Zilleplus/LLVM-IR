@@ -1,8 +1,12 @@
 #include <codegen.h>
 #include <llvm/Support/raw_ostream.h>
+#include <llvm/Transforms/InstCombine/InstCombine.h>
+#include <llvm/Transforms/Scalar.h>
+#include <llvm/Transforms/Scalar/GVN.h>
 #include <notImplmented.h>
 #include <fmt/printf.h>
 #include <stack>
+#include <memory>
 
 namespace infra
 {
@@ -15,22 +19,47 @@ namespace infra
         return out; // we can only end with one value
     }
 
-    const std::vector<llvm::Function*>& IRCodegen::CodeFunctions() const
+    const std::vector<llvm::Function *> &IRCodegen::CodeFunctions() const
     {
         return function_cache;
     }
 
-    IRCodegen::IRCodegen() : TheContext(),
-                             TheModule("llvm jit", TheContext),
-                             Builder(TheContext),
-                             NameValues()
+    IRCodegen::IRCodegen(const DataLayout &data_layout) : data_layout(data_layout),
+                                                          TheModule(nullptr),
+                                                          FPM(nullptr),
+                                                          NameValues()
     {
+        InitializeModuleAndFunctionPassManager();
+    }
+
+    llvm::orc::ThreadSafeModule IRCodegen::ExtractModule()
+    {
+        auto m = std::move(TheModule);
+        auto c = std::move(TheContext);
+        InitializeModuleAndFunctionPassManager();
+        return llvm::orc::ThreadSafeModule(std::move(m), std::move(c));
+    }
+
+    void IRCodegen::InitializeModuleAndFunctionPassManager()
+    {
+        TheContext = std::make_unique<llvm::LLVMContext>();
+        TheModule = std::make_unique<Module>("llvm jit", *TheContext);
+        TheModule->setDataLayout(data_layout);
+
+        Builder = std::make_unique<llvm::IRBuilder<>>(*TheContext);
+
+        FPM = std::make_unique<llvm::legacy::FunctionPassManager>(TheModule.get());
+        FPM->add(createInstructionCombiningPass());
+        FPM->add(createReassociatePass());
+        FPM->add(createGVNPass());
+        FPM->add(createCFGSimplificationPass());
+        FPM->doInitialization();
     }
 
     void IRCodegen::Visit(const NumberExpr &expr)
     {
         // APFloat holds constant of Arbirtray precision
-        auto constant = ConstantFP::get(TheContext, APFloat(expr.Val()));
+        auto constant = ConstantFP::get(*TheContext, APFloat(expr.Val()));
         value_cache.push_back(constant);
     }
 
@@ -57,22 +86,22 @@ namespace infra
         switch (expr.Op())
         {
         case BinaryOperator::ASTERISK:
-            value_cache.push_back(Builder.CreateFMul(left_expr, right_expr, "multmp"));
+            value_cache.push_back(Builder->CreateFMul(left_expr, right_expr, "multmp"));
             break;
         case BinaryOperator::MINUS:
-            value_cache.push_back(Builder.CreateFSub(left_expr, right_expr, "subtmp"));
+            value_cache.push_back(Builder->CreateFSub(left_expr, right_expr, "subtmp"));
             break;
         case BinaryOperator::PLUS:
-            value_cache.push_back(Builder.CreateFAdd(left_expr, right_expr, "addtmp"));
+            value_cache.push_back(Builder->CreateFAdd(left_expr, right_expr, "addtmp"));
             break;
         case BinaryOperator::SMALLER_THEN:
-            left_expr = Builder.CreateFCmpULT(left_expr, right_expr, "cmptmp");
-            left_expr = Builder.CreateUIToFP(left_expr, Type::getDoubleTy(TheContext), "booltmp");
+            left_expr = Builder->CreateFCmpULT(left_expr, right_expr, "cmptmp");
+            left_expr = Builder->CreateUIToFP(left_expr, Type::getDoubleTy(*TheContext), "booltmp");
             value_cache.push_back(left_expr);
             break;
         case BinaryOperator::GREATHER_THEN:
-            left_expr = Builder.CreateFCmpUGT(left_expr, right_expr, "cmptmp");
-            left_expr = Builder.CreateUIToFP(left_expr, Type::getDoubleTy(TheContext), "booltmp");
+            left_expr = Builder->CreateFCmpUGT(left_expr, right_expr, "cmptmp");
+            left_expr = Builder->CreateUIToFP(left_expr, Type::getDoubleTy(*TheContext), "booltmp");
             value_cache.push_back(left_expr);
             break;
         default:
@@ -83,7 +112,7 @@ namespace infra
 
     void IRCodegen::Visit(const CallExpr &expr)
     {
-        llvm::Function *callee_function = TheModule.getFunction(expr.Callee());
+        llvm::Function *callee_function = TheModule->getFunction(expr.Callee());
         if (callee_function == nullptr)
         {
             throw Error{fmt::format("Unable to find function {}.", expr.Callee())};
@@ -106,7 +135,7 @@ namespace infra
             value_cache.pop_back();
         }
 
-        Value *val = Builder.CreateCall(callee_function, args, "calltmp");
+        Value *val = Builder->CreateCall(callee_function, args, "calltmp");
         value_cache.push_back(val);
     }
 
@@ -114,10 +143,10 @@ namespace infra
     {
         std::vector<Type *> Doubles(
             std::size(expr.Args()),
-            Type::getDoubleTy(TheContext));
+            Type::getDoubleTy(*TheContext));
 
         FunctionType *FT = FunctionType::get(
-            Type::getDoubleTy(TheContext),
+            Type::getDoubleTy(*TheContext),
             Doubles,
             false);
 
@@ -125,7 +154,7 @@ namespace infra
             FT,
             llvm::Function::ExternalLinkage,
             expr.Name(),
-            &TheModule);
+            TheModule.get());
 
         // optional step: set the argument names
         int i = 0;
@@ -141,7 +170,7 @@ namespace infra
     void IRCodegen::Visit(const Function &expr)
     {
         auto proto_name = expr.Proto().Name();
-        llvm::Function *TheFunction = TheModule.getFunction(proto_name);
+        llvm::Function *TheFunction = TheModule->getFunction(proto_name);
 
         if (TheFunction == nullptr)
         {
@@ -161,8 +190,8 @@ namespace infra
             }
         }
 
-        BasicBlock *BB = BasicBlock::Create(TheContext, "entry", TheFunction);
-        Builder.SetInsertPoint(BB);
+        BasicBlock *BB = BasicBlock::Create(*TheContext, "entry", TheFunction);
+        Builder->SetInsertPoint(BB);
 
         NameValues.clear();
         for (auto &arg : TheFunction->args())
@@ -176,9 +205,11 @@ namespace infra
 
         if (ret_val != nullptr)
         {
-            Builder.CreateRet(ret_val);
+            Builder->CreateRet(ret_val);
 
             verifyFunction(*TheFunction);
+
+            FPM->run(*TheFunction);
 
             function_cache.push_back(TheFunction);
             return;

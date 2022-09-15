@@ -2,7 +2,8 @@
 #include <scanner.h>
 #include <parser.h>
 #include <codegen.h>
-#include<llvm/Support/raw_ostream.h>
+#include <llvm/Support/raw_ostream.h>
+#include <kaleidoscope_jit.h>
 
 TEST_CASE("Given_Sum_Find_IR")
 {
@@ -15,7 +16,9 @@ TEST_CASE("Given_Sum_Find_IR")
     Parser parser(tkns);
     auto ast = parser.ParseExpression();
 
-    IRCodegen gen;
+    auto expected_jit = llvm::orc::KaleidoscopeJIT::Create();
+    auto data_layout = expected_jit.get()->getDataLayout();
+    IRCodegen gen(data_layout);
     ast->Accept(gen);
 
     // Gen contains the instance of value so keep it alive.
