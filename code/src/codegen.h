@@ -29,7 +29,13 @@ namespace infra
         std::vector<llvm::Value *> value_cache;
         std::vector<llvm::Function *> function_cache;
 
+        // This contains the prototypes of all generated functions.
+        // Even those not in the module anymore.
+        std::map<std::string, std::unique_ptr<Prototype>> function_protos;
+
         void InitializeModuleAndFunctionPassManager();
+
+        llvm::Function *GetFunction(std::string name);
 
     public:
         struct Error

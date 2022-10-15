@@ -59,6 +59,13 @@ int main()
                 }
                 auto code = gen.CodeFunctions().back();
                 code->print(llvm::outs());
+
+                auto H = jit->addModule(llvm::orc::ThreadSafeModule(std::move(gen.ExtractModule())));
+                llvm::logAllUnhandledErrors(
+                    std::move(H),
+                     llvm::errs(),
+                     "[unhandled Error when adding function definition to jit] ");
+
             }
             break;
             case TokenType::ext:
@@ -75,6 +82,12 @@ int main()
                 }
                 auto code = gen.CodeFunctions().back();
                 code->print(llvm::outs());
+
+                auto H = jit->addModule(llvm::orc::ThreadSafeModule(std::move(gen.ExtractModule())));
+                llvm::logAllUnhandledErrors(
+                    std::move(H),
+                     llvm::errs(),
+                     "[unhandled Error when adding exteral to jit] ");
             }
             break;
             default:

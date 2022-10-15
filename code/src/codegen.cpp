@@ -112,7 +112,7 @@ namespace infra
 
     void IRCodegen::Visit(const CallExpr &expr)
     {
-        llvm::Function *callee_function = TheModule->getFunction(expr.Callee());
+        llvm::Function *callee_function = GetFunction(expr.Callee());
         if (callee_function == nullptr)
         {
             throw Error{fmt::format("Unable to find function {}.", expr.Callee())};
@@ -165,12 +165,15 @@ namespace infra
         }
 
         function_cache.push_back(F);
+
+        // keep the prototype between modules:
+        function_protos[expr.Name()] = std::make_unique<Prototype>(expr);
     }
 
     void IRCodegen::Visit(const Function &expr)
     {
         auto proto_name = expr.Proto().Name();
-        llvm::Function *TheFunction = TheModule->getFunction(proto_name);
+        llvm::Function *TheFunction = GetFunction(proto_name);
 
         if (TheFunction == nullptr)
         {
@@ -218,4 +221,31 @@ namespace infra
         // error -> remove the function
         TheFunction->eraseFromParent();
     }
+
+    llvm::Function *IRCodegen::GetFunction(std::string name)
+    {
+        if (auto *F = TheModule->getFunction(name))
+        // function is in current module
+        {
+            return F;
+        }
+
+        auto proto_previous_module = function_protos.find(name);
+        if (proto_previous_module != function_protos.end())
+        {
+            // The function/extern was defined in some previous module.
+            // Get the prototype expression, and generate the llvm
+            // function using visit.
+            const auto &p = *proto_previous_module;
+            Visit(*p.second);
+            // The function prototype is now in the module, so we can use it.
+            llvm::Function *f = function_cache.back();
+            function_cache.pop_back();
+            return f;
+        }
+
+        // function does not exist
+        return nullptr;
+    }
+
 }
