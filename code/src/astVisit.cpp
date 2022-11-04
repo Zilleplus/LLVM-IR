@@ -32,4 +32,9 @@ namespace infra{
     {
         vis.Visit(*this);
     }
+
+    void IfExpr::Accept(Visitor& vis) const
+    {
+        vis.Visit(*this);
+    }
 }

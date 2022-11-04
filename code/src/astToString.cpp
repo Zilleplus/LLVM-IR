@@ -41,4 +41,12 @@ namespace infra
     {
         return fmt::format("(function {} {})", this->proto->ToString(), this->body->ToString());
     }
+
+    std::string IfExpr::ToString() const 
+    {
+        return fmt::format("(if {} then {} else {})",
+            condition->ToString(),
+            then_expr->ToString(),
+            else_expr->ToString());
+    }
 }

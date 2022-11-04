@@ -12,6 +12,7 @@ namespace infra
         virtual void Visit(const CallExpr &expr) = 0;
         virtual void Visit(const Prototype &expr) = 0;
         virtual void Visit(const Function &expr) = 0;
+        virtual void Visit(const IfExpr &expr) = 0;
     };
 
     void DepthFirstVisit(Visitor &);

@@ -36,6 +36,8 @@ namespace infra
 
         std::unique_ptr<Function> ParseTopLevelExpr();
 
+        std::unique_ptr<IfExpr> ParseIfExpr();
+
         struct Error{
             int line_number;
             int position;

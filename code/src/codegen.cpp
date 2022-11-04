@@ -139,6 +139,58 @@ namespace infra
         value_cache.push_back(val);
     }
 
+    void IRCodegen::Visit(const IfExpr &expr)
+    {
+        expr.Condition().Accept(*this);
+        llvm::Value* condV = value_cache.back();
+        value_cache.pop_back();
+        if (condV == nullptr)
+        {
+            NOT_IMPLEMENTED;
+        }
+        condV = Builder->CreateFCmpONE(condV, llvm::ConstantFP::get(*TheContext, APFloat(0.0)), "ifcond");
+
+        llvm::Function* func = Builder->GetInsertBlock()->getParent();
+
+        llvm::BasicBlock* then_block = BasicBlock::Create(*TheContext, "then", func);
+        llvm::BasicBlock* else_block = BasicBlock::Create(*TheContext, "else");
+        llvm::BasicBlock* merge_block = BasicBlock::Create(*TheContext, "ifcont");
+
+        // create branch
+        Builder->CreateCondBr(condV, then_block, else_block);
+        
+        Builder->SetInsertPoint(then_block);
+        expr.Then().Accept(*this);
+        llvm::Value* thenV = value_cache.back();
+        value_cache.pop_back();
+        if (thenV == nullptr)
+        {
+            NOT_IMPLEMENTED;
+        }
+
+        Builder->CreateBr(merge_block);
+        // Codegen of 'then' block can change the current block. Update then_block for the phi.
+        then_block = Builder->GetInsertBlock();
+
+        func->getBasicBlockList().push_back(else_block);
+        Builder->SetInsertPoint(else_block);
+        expr.Else().Accept(*this);
+        llvm::Value* elseV = value_cache.back();
+        value_cache.pop_back();
+        if(elseV == nullptr)
+        {
+            NOT_IMPLEMENTED;
+        }
+
+        Builder->CreateBr(merge_block);
+        // Codegen of 'else' block can change the current block. Update else_block for the phi.
+        else_block = Builder->GetInsertBlock();
+
+        func->getBasicBlockList().push_back(merge_block);
+        Builder->SetInsertPoint(merge_block);
+        llvm::PHINode* phi_node = Builder->CreatePHI(Type::getDoubleTy(*TheContext), 2, "iftmp");
+    }
+
     void IRCodegen::Visit(const Prototype &expr)
     {
         std::vector<Type *> Doubles(

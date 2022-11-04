@@ -6,7 +6,7 @@
 
 namespace infra
 {
-    std::string Parser::anon_expr  = "__anon_expr";
+    std::string Parser::anon_expr = "__anon_expr";
 
     Parser::Parser(const std::vector<Token> &tokens) : tokens(tokens), current(0)
     {
@@ -198,6 +198,10 @@ namespace infra
         {
             return ParseIndentifier();
         }
+        else if (Check(TokenType::if_))
+        {
+            return ParseIfExpr();
+        }
 
         // Not a number of identifier? something is wrong.
 
@@ -318,4 +322,23 @@ namespace infra
 
         return std::make_unique<Function>(std::move(proto), std::move(body));
     }
+
+    std::unique_ptr<IfExpr> Parser::ParseIfExpr()
+    {
+        Consume(TokenType::if_, "expected if");
+        auto cond = ParseExpression();
+
+        Consume(TokenType::then, "expected then");
+        auto true_expr = ParseExpression();
+
+        // As this is an expression based language we must have an else.
+        Consume(TokenType::else_, "expected else");
+        auto false_expr = ParseExpression();
+
+        return std::make_unique<IfExpr>(
+            std::move(cond),
+            std::move(true_expr),
+            std::move(false_expr));
+    }
+
 }

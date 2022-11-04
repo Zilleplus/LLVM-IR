@@ -56,5 +56,6 @@ namespace infra
         virtual void Visit(const CallExpr &expr) override;
         virtual void Visit(const Prototype &expr) override;
         virtual void Visit(const Function &expr) override;
+        virtual void Visit(const IfExpr &expr) override;
     };
 }

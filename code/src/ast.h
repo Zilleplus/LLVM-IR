@@ -146,6 +146,7 @@ namespace infra
         std::unique_ptr<Expr> then_expr;
         std::unique_ptr<Expr> else_expr;
 
+    public:
         IfExpr(
         std::unique_ptr<Expr> condition,
         std::unique_ptr<Expr> then_expr,
@@ -155,6 +156,20 @@ namespace infra
             else_expr(std::move(then_expr))
         {}
 
+        const Expr& Condition() const {
+            return *condition;
+        }
+
+        const Expr& Then() const {
+            return *then_expr;
+        }
+
+        const Expr& Else() const {
+            return *else_expr;
+        }
+
+        virtual void Accept(Visitor &vis) const override;
+        virtual std::string ToString() const override;
     };
 
     class Prototype : public Ast
