@@ -1,5 +1,5 @@
 #include <catch2/catch_all.hpp>
-#include <scanner.h>
+#include <LLVM_IR/scanner.h>
 #include <fmt/format.h>
 #include <fmt/ranges.h>
 #include <algorithm>
@@ -37,7 +37,7 @@ TEST_CASE("Given_Numbers_In_Source_Find_Number_Token")
 
 TEST_CASE("Given_Text_Find_TokenType")
 {
-    std::vector<std::pair<std::string, TokenType>> nums_text{
+    std::vector<std::pair<std::string, infra::TokenType>> nums_text{
         {"def", TokenType::def},
         {"extern", TokenType::ext},
         {"(", TokenType::left_paren},
@@ -77,7 +77,7 @@ TEST_CASE("Given_Text_Find_TokenType")
 
 TEST_CASE("Given_Bin_Op_Text_Find_Tokens")
 {
-    std::vector<std::pair<std::string, std::vector<TokenType>>> nums_text{
+    std::vector<std::pair<std::string, std::vector<infra::TokenType>>> nums_text{
         {"1+2*3", {TokenType::number, TokenType::plus, TokenType::number, TokenType::asterisk, TokenType::number}},
     };
 
@@ -85,7 +85,7 @@ TEST_CASE("Given_Bin_Op_Text_Find_Tokens")
     {
         Scanner s(input);
         auto res= s.ScanTokens();
-        std::vector<TokenType> res_tok_types;
+        std::vector<infra::TokenType> res_tok_types;
         for(auto t : res)
         {
             res_tok_types.push_back(t.type);

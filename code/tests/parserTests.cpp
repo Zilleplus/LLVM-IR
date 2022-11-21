@@ -1,12 +1,12 @@
 #include <catch2/catch_all.hpp>
-#include <parser.h>
-#include <scanner.h>
+#include <LLVM_IR/parser.h>
+#include <LLVM_IR/scanner.h>
 
 using namespace infra;
 
-static std::vector<TokenType> Types(const std::vector<Token>& tks)
+static std::vector<infra::TokenType> Types(const std::vector<Token>& tks)
 {
-    std::vector<TokenType> out;
+    std::vector<infra::TokenType> out;
     for(auto t : tks)
     {
         out.push_back(t.type);
@@ -60,7 +60,7 @@ TEST_CASE("Given_Function_In_Source_Find_AST")
     Scanner scanner(source);
     auto tks = scanner.ScanTokens();
 
-    std::vector<TokenType> types = {
+    std::vector<infra::TokenType> types = {
         TokenType::def,
         TokenType::identifier,
         TokenType::left_paren,
@@ -90,7 +90,7 @@ TEST_CASE("Given_Call_In_Source_Find_Ast")
     Scanner scanner(source);
     auto tks = scanner.ScanTokens();
 
-    std::vector<TokenType> exp_types = {
+    std::vector<infra::TokenType> exp_types = {
         TokenType::identifier,
         TokenType::left_paren,
         TokenType::identifier,
@@ -116,7 +116,7 @@ TEST_CASE("Given_2_Argment_Function_in_source_find_ast")
     Scanner scanner(source);
     auto tks = scanner.ScanTokens();
 
-    std::vector<TokenType> exp_types = {
+    std::vector<infra::TokenType> exp_types = {
         TokenType::def,
         TokenType::identifier,
         TokenType::left_paren,

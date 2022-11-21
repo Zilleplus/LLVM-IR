@@ -1,10 +1,10 @@
 #pragma once
 
-#include <ast.h>
 #include <map>
 #include <string>
-#include <visitor.h>
 #include <memory>
+#include <LLVM_IR/ast.h>
+#include <LLVM_IR/visitor.h>
 
 #include <llvm/IR/Value.h>
 #include <llvm/IR/IRBuilder.h>
@@ -13,7 +13,7 @@
 #include <llvm/IR/Value.h>
 #include <llvm/IR/LegacyPassManager.h>
 
-#include <kaleidoscope_jit.h>
+#include <LLVM_IR/kaleidoscope_jit.h>
 
 namespace infra
 {
