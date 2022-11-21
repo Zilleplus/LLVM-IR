@@ -1,7 +1,7 @@
 #pragma once
 
+#include <LLVM_IR/token.h>
 #include <string>
-#include <token.h>
 #include <vector>
 
 namespace infra

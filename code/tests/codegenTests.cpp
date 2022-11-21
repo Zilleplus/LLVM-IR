@@ -1,9 +1,9 @@
 #include <catch2/catch_all.hpp>
-#include <scanner.h>
-#include <parser.h>
-#include <codegen.h>
+#include <LLVM_IR/scanner.h>
+#include <LLVM_IR/parser.h>
+#include <LLVM_IR/codegen.h>
 #include <llvm/Support/raw_ostream.h>
-#include <kaleidoscope_jit.h>
+#include <LLVM_IR/kaleidoscope_jit.h>
 
 TEST_CASE("Given_Sum_Find_IR")
 {

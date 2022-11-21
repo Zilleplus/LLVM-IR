@@ -1,7 +1,7 @@
 #pragma once
 
-#include <token.h>
-#include <ast.h>
+#include <LLVM_IR/token.h>
+#include <LLVM_IR/ast.h>
 #include <vector>
 #include <optional>
 #include <map>

@@ -3,7 +3,7 @@
 #include <string>
 #include <memory>
 #include <vector>
-#include <token.h>
+#include <LLVM_IR/token.h>
 
 namespace infra
 {

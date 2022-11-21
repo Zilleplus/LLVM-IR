@@ -1,14 +1,14 @@
 #include <iostream>
-#include <parser.h>
-#include <scanner.h>
-#include <codegen.h>
+#include <LLVM_IR/parser.h>
+#include <LLVM_IR/scanner.h>
+#include <LLVM_IR/codegen.h>
+#include <LLVM_IR/kaleidoscope_jit.h>
 #include <llvm/Support/raw_ostream.h>
 #include <llvm/Support/TargetSelect.h>
 #include <llvm/Support/Error.h>
-#include <kaleidoscope_jit.h>
 #include <fmt/printf.h>
 #include <fmt/ranges.h>
-
+ 
 int main()
 {
     llvm::InitializeNativeTarget();

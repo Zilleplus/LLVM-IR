@@ -1,5 +1,5 @@
 #pragma once
-#include <ast.h>
+#include <LLVM_IR/ast.h>
 
 namespace infra
 {
