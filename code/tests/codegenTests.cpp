@@ -4,6 +4,7 @@
 #include <LLVM_IR/codegen.h>
 #include <llvm/Support/raw_ostream.h>
 #include <LLVM_IR/kaleidoscope_jit.h>
+#include <llvm/Support/TargetSelect.h>
 
 TEST_CASE("Given_Sum_Find_IR")
 {
@@ -16,7 +17,12 @@ TEST_CASE("Given_Sum_Find_IR")
     Parser parser(tkns);
     auto ast = parser.ParseExpression();
 
+    llvm::InitializeNativeTarget();
+    llvm::InitializeNativeTargetAsmPrinter();
+    llvm::InitializeNativeTargetAsmParser();
     auto expected_jit = llvm::orc::KaleidoscopeJIT::Create();
+    REQUIRE(expected_jit);
+
     auto data_layout = expected_jit.get()->getDataLayout();
     IRCodegen gen(data_layout);
     ast->Accept(gen);
