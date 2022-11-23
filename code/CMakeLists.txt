@@ -2,57 +2,32 @@ cmake_minimum_required(VERSION 3.20)
 project(llvm-ir CXX C)
 set (CMAKE_CXX_STANDARD 17)
 
+
 # Not clean, I should find a better way to do this.
 if(UNIX)
-	set(CMAKE_CXX_FLAGS "-fuse-ld=gold")
+	#set(CMAKE_CXX_FLAGS "-fuse-ld=gold")
 endif()
 
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_BINARY_DIR})
 list(APPEND CMAKE_PREFIX_PATH ${CMAKE_BINARY_DIR})
 
-set(LLVM_INSTALL_LOCATION "${CMAKE_CURRENT_LIST_DIR}/llvm")
+set(EXTERNAL_LIBS "${CMAKE_SOURCE_DIR}/deps")
+
+set(LLVM_INSTALL_LOCATION "${EXTERNAL_LIBS}/llvm/build")
 set(LLVM_LIB_LIST
-	LLVMAArch64AsmParser
-	LLVMAArch64CodeGen
-	LLVMAArch64Desc
-	LLVMAArch64Disassembler
-	LLVMAArch64Info
-	LLVMAArch64Utils
+	LLVMCore
+	LLVMSupport
 	LLVMAggressiveInstCombine
-	LLVMAMDGPUAsmParser
-	LLVMAMDGPUCodeGen
-	LLVMAMDGPUDesc
-	LLVMAMDGPUDisassembler
-	LLVMAMDGPUInfo
-	LLVMAMDGPUTargetMCA
-	LLVMAMDGPUUtils
 	LLVMAnalysis
-	LLVMARMAsmParser
-	LLVMARMCodeGen
-	LLVMARMDesc
-	LLVMARMDisassembler
-	LLVMARMInfo
-	LLVMARMUtils
 	LLVMAsmParser
 	LLVMAsmPrinter
-	LLVMAVRAsmParser
-	LLVMAVRCodeGen
-	LLVMAVRDesc
-	LLVMAVRDisassembler
-	LLVMAVRInfo
 	LLVMBinaryFormat
 	LLVMBitReader
 	LLVMBitstreamReader
 	LLVMBitWriter
-	LLVMBPFAsmParser
-	LLVMBPFCodeGen
-	LLVMBPFDesc
-	LLVMBPFDisassembler
-	LLVMBPFInfo
 	LLVMCFGuard
 	LLVMCFIVerify
 	LLVMCodeGen
-	LLVMCore
 	LLVMCoroutines
 	LLVMCoverage
 	LLVMDebugInfoCodeView
@@ -69,9 +44,6 @@ set(LLVM_LIB_LIST
 	LLVMDWP
 	LLVMExecutionEngine
 	LLVMExegesis
-	LLVMExegesisAArch64
-	LLVMExegesisMips
-	LLVMExegesisPowerPC
 	LLVMExegesisX86
 	LLVMExtensions
 	LLVMFileCheck
@@ -81,11 +53,6 @@ set(LLVM_LIB_LIST
 	LLVMFuzzerCLI
 	LLVMFuzzMutate
 	LLVMGlobalISel
-	LLVMHexagonAsmParser
-	LLVMHexagonCodeGen
-	LLVMHexagonDesc
-	LLVMHexagonDisassembler
-	LLVMHexagonInfo
 	LLVMInstCombine
 	LLVMInstrumentation
 	LLVMInterfaceStub
@@ -94,11 +61,6 @@ set(LLVM_LIB_LIST
 	LLVMIRPrinter
 	LLVMIRReader
 	LLVMJITLink
-	LLVMLanaiAsmParser
-	LLVMLanaiCodeGen
-	LLVMLanaiDesc
-	LLVMLanaiDisassembler
-	LLVMLanaiInfo
 	LLVMLibDriver
 	LLVMLineEditor
 	LLVMLinker
@@ -108,20 +70,7 @@ set(LLVM_LIB_LIST
 	LLVMMCDisassembler
 	LLVMMCJIT
 	LLVMMCParser
-	LLVMMipsAsmParser
-	LLVMMipsCodeGen
-	LLVMMipsDesc
-	LLVMMipsDisassembler
-	LLVMMipsInfo
 	LLVMMIRParser
-	LLVMMSP430AsmParser
-	LLVMMSP430CodeGen
-	LLVMMSP430Desc
-	LLVMMSP430Disassembler
-	LLVMMSP430Info
-	LLVMNVPTXCodeGen
-	LLVMNVPTXDesc
-	LLVMNVPTXInfo
 	LLVMObjCARCOpts
 	LLVMObjCopy
 	LLVMObject
@@ -131,51 +80,18 @@ set(LLVM_LIB_LIST
 	LLVMOrcShared
 	LLVMOrcTargetProcess
 	LLVMPasses
-	LLVMPowerPCAsmParser
-	LLVMPowerPCCodeGen
-	LLVMPowerPCDesc
-	LLVMPowerPCDisassembler
-	LLVMPowerPCInfo
 	LLVMProfileData
 	LLVMRemarks
-	LLVMRISCVAsmParser
-	LLVMRISCVCodeGen
-	LLVMRISCVDesc
-	LLVMRISCVDisassembler
-	LLVMRISCVInfo
-	LLVMRISCVTargetMCA
 	LLVMRuntimeDyld
 	LLVMScalarOpts
 	LLVMSelectionDAG
-	LLVMSparcAsmParser
-	LLVMSparcCodeGen
-	LLVMSparcDesc
-	LLVMSparcDisassembler
-	LLVMSparcInfo
-	LLVMSupport
 	LLVMSymbolize
-	LLVMSystemZAsmParser
-	LLVMSystemZCodeGen
-	LLVMSystemZDesc
-	LLVMSystemZDisassembler
-	LLVMSystemZInfo
 	LLVMTableGen
 	LLVMTableGenGlobalISel
 	LLVMTarget
 	LLVMTextAPI
 	LLVMTransformUtils
-	LLVMVEAsmParser
-	LLVMVECodeGen
 	LLVMVectorize
-	LLVMVEDesc
-	LLVMVEDisassembler
-	LLVMVEInfo
-	LLVMWebAssemblyAsmParser
-	LLVMWebAssemblyCodeGen
-	LLVMWebAssemblyDesc
-	LLVMWebAssemblyDisassembler
-	LLVMWebAssemblyInfo
-	LLVMWebAssemblyUtils
 	LLVMWindowsDriver
 	LLVMWindowsManifest
 	LLVMX86AsmParser
@@ -184,13 +100,7 @@ set(LLVM_LIB_LIST
 	LLVMX86Disassembler
 	LLVMX86Info
 	LLVMX86TargetMCA
-	LLVMXCoreCodeGen
-	LLVMXCoreDesc
-	LLVMXCoreDisassembler
-	LLVMXCoreInfo
-	LLVMXRay
-	LTO
-	Remarks)
+	)
 
 # Ninja on linux will error on depencies if you 
 # don't put the so files as byproducts.
@@ -216,36 +126,55 @@ ExternalProject_Add(llvm_from_source
     SOURCE_DIR "${CMAKE_CURRENT_LIST_DIR}/../../llvm-project"
 	#GIT_REPOSITORY https://github.com/llvm/llvm-project.git
 	GIT_TAG llvmorg-13.0.1
-    SOURCE_SUBDIR llvm
+	SOURCE_SUBDIR llvm
     CMAKE_ARGS
-        -DCMAKE_ENABLE_PROJECTS='llvm'
+		-DLLVM_ENABLE_PROJECTS='llvm'
         -G Ninja
         -DCMAKE_INSTALL_PREFIX=${LLVM_INSTALL_LOCATION}
 		-DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
 		-DLLVM_CCACHE_BUILD=${LLVM_ENABLE_CCACHE}
 		-DLLVM_TARGETS_TO_BUILD=X86
+		-DBUILD_SHARED_LIB=OFF
 	TEST_AFTER_INSTALL 1
 	TEST_COMMAND ${CMAKE_COMMAND} -E touch ${CMAKE_CURRENT_LIST_FILE}	
 	BUILD_ALWAYS 1
 	BUILD_BYPRODUCTS ${LLVM_LIBS_LOCATIONS}
 )
 
-add_library(llvm::llvm INTERFACE IMPORTED)
-add_dependencies(llvm::llvm llvm_from_source)
+add_library(llvm_lib INTERFACE)
 
 # Create the include dir, this hack can prob be avoided by using a fetch.
 file(MAKE_DIRECTORY "${LLVM_INSTALL_LOCATION}/include")
 
 foreach(LLVM_LIB ${LLVM_LIB_LIST})
-	add_library(llvm::${LLVM_LIB} SHARED IMPORTED)
+	add_library(llvm::${LLVM_LIB} STATIC IMPORTED)
 	add_dependencies(llvm::${LLVM_LIB} llvm_from_source)
  	set_target_properties(llvm::${LLVM_LIB} PROPERTIES
 		INTERFACE_INCLUDE_DIRECTORIES "${LLVM_INSTALL_LOCATION}/include"
- 		IMPORTED_IMPLIB "${LLVM_INSTALL_LOCATION}/lib/${LLVM_LIB}.lib" # windows
- 		IMPORTED_LOCATION "${LLVM_INSTALL_LOCATION}/lib/${LLVM_LIB}.so" # linux
  		)
- 	target_link_libraries(llvm::llvm INTERFACE llvm::${LLVM_LIB})
+ 	set_target_properties(llvm::${LLVM_LIB} PROPERTIES
+ 		IMPORTED_LOCATION "${LLVM_INSTALL_LOCATION}/lib/lib${LLVM_LIB}.a" # linux
+		)
+	target_link_libraries(llvm_lib INTERFACE llvm::${LLVM_LIB})
 endforeach(LLVM_LIB)
+
+# llvm Remarks seems to be a shared library on linux
+add_library(llvm::Remarks SHARED IMPORTED)
+add_dependencies(llvm::Remarks llvm_from_source)
+set_target_properties(llvm::Remarks PROPERTIES
+	INTERFACE_INCLUDE_DIRECTORIES "${LLVM_INSTALL_LOCATION}/include")
+set_target_properties(llvm::Remarks PROPERTIES
+	IMPORTED_LOCATION "${LLVM_INSTALL_LOCATION}/lib/libRemarks.so")
+target_link_libraries(llvm_lib INTERFACE llvm::Remarks)
+
+add_library(llvm::LTO SHARED IMPORTED)
+add_dependencies(llvm::LTO llvm_from_source)
+set_target_properties(llvm::LTO PROPERTIES
+	INTERFACE_INCLUDE_DIRECTORIES "${LLVM_INSTALL_LOCATION}/include")
+set_target_properties(llvm::LTO PROPERTIES
+	IMPORTED_LOCATION "${LLVM_INSTALL_LOCATION}/lib/libLTO.so")
+target_link_libraries(llvm_lib INTERFACE llvm::LTO)
+
 
 include(${CMAKE_CURRENT_LIST_DIR}/conan.cmake)
 
@@ -269,8 +198,8 @@ conan_cmake_install(PATH_OR_REFERENCE .
 find_package(fmt REQUIRED)
 find_package(Catch2 REQUIRED)
 
-add_subdirectory(tests)
 add_subdirectory(src/LLVM_IR)
+#add_subdirectory(tests)
 
 add_executable(driver ${CMAKE_CURRENT_LIST_DIR}/driver.cpp)
-target_link_libraries(driver Infra fmt::fmt )
+target_link_libraries(driver Infra fmt::fmt)
